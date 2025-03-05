@@ -1,6 +1,3 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: github-programmers-rank
 
 on:
@@ -9,7 +6,7 @@ on:
   pull_request:
     branches: [ "master" ]
   schedule:
-    - cron: '0 14 * * *'
+    - cron: '0 14 * * *'  # 매일 14시 (UTC) 마다 실행되도록 설정
 
 jobs:
   build:
@@ -30,7 +27,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run:  echo ${{ secrets.PROGRAMMERS_TOKEN_ID }}
     - run: npm install
     - run: npm run build
     - run: |
@@ -39,13 +35,22 @@ jobs:
         echo PROGRAMMERS_TOKEN_PW=${{ secrets.PROGRAMMERS_TOKEN_PW }} >> .env
         npm run start
 
+    # result.svg 파일을 lib/ 디렉토리로 이동하고 GitHub에 푸시
+    - name: Push result.svg to GitHub
+      run: |
+        git config --global user.name "printjin"
+        git config --global user.email "printjin@gmail.com"
+        mv ./path_to_your_result_svg/lib/result.svg ./lib/result.svg  # result.svg 경로 조정
+        git add lib/result.svg
+        git commit -m "Update result.svg"
+        git push origin master
+
   cron:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [14.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v3
@@ -57,7 +62,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run:  echo ${{ secrets.PROGRAMMERS_TOKEN_ID }}
     - run: npm install
     - run: npm run build
     - run: |
@@ -66,15 +70,22 @@ jobs:
         echo PROGRAMMERS_TOKEN_PW=${{ secrets.PROGRAMMERS_TOKEN_PW }} >> .env
         npm run start
         
+    # result.svg 파일을 lib/ 디렉토리로 이동하고 GitHub에 푸시
+    - name: Push result.svg to GitHub
+      run: |
+        git config --global user.name "printjin"
+        git config --global user.email "printjin@gmail.com"
+        mv ./path_to_your_result_svg/lib/result.svg ./lib/result.svg  # result.svg 경로 조정
+        git add lib/result.svg
+        git commit -m "Update result.svg"
+        git push origin master
+
   # lint:
   #   name: Lint
-
   #   runs-on: ubuntu-latest
-
   #   strategy:
   #     matrix:
   #       node-version: [14.x]
-
   #   steps:
   #   - uses: actions/checkout@v3
   #   - name: Use Node.js ${{ matrix.node-version }}
